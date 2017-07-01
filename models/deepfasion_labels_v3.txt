@@ -1,0 +1,16 @@
+blouse
+cardigan
+blazer
+shorts
+coat
+sweater
+tee
+henley
+jacket
+hoodie
+caftan
+chemis
+dress
+jumpsuit
+skirt
+pantalon
