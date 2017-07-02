@@ -17,6 +17,13 @@ from django.contrib.auth.models import User
 from cart.forms import CartAddProductForm
 from math import *
 from orders.models import Order
+from .forms import ImageUploadForm
+from .models import upload1
+from django.http import HttpResponseRedirect
+
+
+
+
 
 
 
@@ -367,6 +374,29 @@ def current_user_id(request):
 
         }
         return render(request, 'photos/user_page.html', context)
+
+
+# def imgsearch(request):
+#
+#     if request.method == 'POST':
+#         form = ImageUploadForm(request.POST, request.FILES)
+#
+#
+#         if form.is_valid():
+#             # id = uplo
+#             # id.product.save(request.FILES['product'].name)
+#
+#             p = upload1(product=request.FILES['product'])
+#             p.save()
+#             # return HttpResponseRedirect('/photos/')
+#
+#     else:
+#         form =  ImageUploadForm
+#     return render(request, 'upload2/imgsearch.html',{'form':form})
+#
+
+
+    # return render(request, 'photos/imgsearch.html')
 
 
 

@@ -9,6 +9,8 @@ urlpatterns = [
 	url(r'^photos/' , include('photos.urls',namespace='photos')),
 	url(r'^orders/', include('orders.urls', namespace='orders')),
 	url(r'^upload/', include('upload.urls', namespace='upload')),
+    url(r'^upload2/', include('upload2.urls', namespace='upload2')),
+
 	url(r'^users/' , include('users.urls')),
 ]
 

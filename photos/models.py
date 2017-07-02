@@ -1,5 +1,6 @@
 from __future__ import unicode_literals
 from django.db import models
+from django.contrib.auth.models import User
 
 
 class ImageClass(models.Model):
@@ -28,4 +29,5 @@ class Photo(models.Model):
     def __str__(self):
         return self.name
 
-
+class upload1(models.Model):
+    product = models.FileField(upload_to='media')
