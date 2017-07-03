@@ -217,7 +217,7 @@ def search_buttons(request , id):
 def home_page(request , username):
     photos_of_user_orders = Photo.objects.all()
     final_recommended_photos = Photo.objects.all()
-    photos_of_user_uploads =  Photo.objects.all()
+    user_uploads =  Image.objects.all()
 
     if request.user.is_authenticated:
         user_orders = Order.objects.filter(userid = request.user.id)
@@ -229,8 +229,8 @@ def home_page(request , username):
         user_uploads = Image.objects.filter(userid = request.user.id)
         list_of_user_uploads = []
         for upload in user_uploads:
-            list_of_user_uploads.append(upload.id)
-        photos_of_user_uploads = Photo.objects.filter(id__in=list_of_user_uploads)
+            list_of_user_uploads.append(upload.product)
+        photos_of_user_uploads = Photo.objects.filter(photo__in=list_of_user_uploads)
 
         recommended_photos = []
         for photo in photos_of_user_orders:
@@ -246,8 +246,8 @@ def home_page(request , username):
 
     return render(request, 'photos/user_home_page.html' , {'photos_of_user_orders':photos_of_user_orders
                                                            , 'orders_size' : len(photos_of_user_orders)
-                                                           , 'photos_of_user_uploads' : photos_of_user_uploads
-                                                           , 'uploads_size' : len(photos_of_user_uploads)
+                                                           , 'photos_of_user_uploads' : user_uploads
+                                                           , 'uploads_size' : len(user_uploads)
                                                            , 'final_recommended_photos' : final_recommended_photos
                                                            , 'username':request.user.username})
 
