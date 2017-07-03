@@ -169,7 +169,8 @@ def upload_detail(request):
         if form.is_valid():
             p.save()
             handling_uploaded_photo(p)
-            return HttpResponseRedirect('/photos/')
+            return HttpResponseRedirect('/photos/' + request.user.username + '/')
+
 
     else:
         form = ImageForm()

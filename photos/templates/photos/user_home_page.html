@@ -15,10 +15,7 @@
                                 <div id="wrapper">
                                     <div id="columns">
                                         <div class="pin">
-
                                                 <img src="{{ photo.product.url }}" class="img-responsive" style="float: left;"/>
-
-                                            </a>
                                         </div>
                                     </div>
                                 </div>
@@ -42,10 +39,9 @@
                                 <div id="wrapper">
                                     <div id="columns">
                                         <div class="pin">
-
+                                                <a href="{% url 'photos:detail' photo.id %}" >
                                                 <img src="{{ photo.photo.url }}" class="img-responsive" style="float: left;"/>
-
-                                            </a>
+                                                </a>
                                         </div>
                                     </div>
                                 </div>
@@ -69,7 +65,7 @@
                                 <div id="wrapper">
                                     <div id="columns">
                                         <div class="pin">
-
+                                             <a href="{% url 'photos:detail' photo.id %}" >
                                                 <img src="{{ photo.photo.url }}" class="img-responsive" style="float: left;"/>
 
                                                 <form action="{% url 'cart:cart_add' photo.id %}" method="post">
