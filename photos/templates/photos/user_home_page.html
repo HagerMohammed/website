@@ -1,0 +1,96 @@
+{% extends 'photos/base.html' %}
+
+{% block some_page_contents %}
+    {% load staticfiles %}
+
+    <link rel="stylesheet" type="text/css" href="{% static 'photos/pins.css' %}">
+    <div class="container">
+        {% if uploads_size > 0 %}
+            <p>Your uploads history</p>
+            <ul>
+                    <!--div class="row"-->
+                        {%  for photo in photos_of_user_uploads %}
+                        <!--div class="col-sm-4" -->
+                            <li style="display: inline">
+                                <div id="wrapper">
+                                    <div id="columns">
+                                        <div class="pin">
+
+                                                <img src="{{ photo.photo.url }}" class="img-responsive" style="float: left;"/>
+
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </li>
+                        <!--/div-->
+                        {% endfor %}
+                    <!--/--div-->
+            </ul>
+        {% else %}
+            <p>You don't have any uploads.</p>
+        {% endif %}
+
+
+        {% if orders_size > 0 %}
+            <p>Your orders history</p>
+            <ul>
+                    <!--div class="row"-->
+                        {%  for photo in photos_of_user_orders %}
+                        <!--div class="col-sm-4" -->
+                            <li style="display: inline">
+                                <div id="wrapper">
+                                    <div id="columns">
+                                        <div class="pin">
+
+                                                <img src="{{ photo.photo.url }}" class="img-responsive" style="float: left;"/>
+
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </li>
+                        <!--/div-->
+                        {% endfor %}
+                    <!--/--div-->
+            </ul>
+        {% else %}
+            <p>You don't have any orders.</p>
+        {% endif %}
+
+
+        {% if orders_size > 0 %}
+            <p>Recommended for you:</p>
+            <ul>
+                    <!--div class="row"-->
+                        {%  for photo in final_recommended_photos %}
+                        <!--div class="col-sm-4" -->
+                            <li style="display: inline">
+                                <div id="wrapper">
+                                    <div id="columns">
+                                        <div class="pin">
+
+                                                <img src="{{ photo.photo.url }}" class="img-responsive" style="float: left;"/>
+
+                                                <form action="{% url 'cart:cart_add' photo.id %}" method="post">
+                                                  {{ cart_product_form }}
+                                                  {% csrf_token %}
+                                                  <input type="submit" value="Add to cart">
+                                                </form>
+
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </li>
+                        <!--/div-->
+                        {% endfor %}
+                    <!--/--div-->
+            </ul>
+        {% else %}
+            <p>No orders then no recommendations. <a href="{% url 'photos:index' %}">So go to Pics home page</a></p>
+        {% endif %}
+
+
+    </div>
+{% endblock %}

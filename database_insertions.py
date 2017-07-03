@@ -53,6 +53,8 @@ for label in only_labels:
     label_class = LabelsClass(label_name = label)
     label_class.save()
 
+temp_class = ImageClass(class_name = 'temp')
+temp_class.save()
 
 for root, dirs, files in os.walk(images_directory):
     for direcory in dirs:

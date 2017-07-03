@@ -1,39 +1,17 @@
-from django.views import generic
 from django.shortcuts import render , redirect
-from django.views.generic.edit import CreateView , UpdateView , DeleteView
 from models import Photo , ImageClass , LabelsClass
-from django.http import HttpResponse
 import numpy as np
 import tensorflow as tf
-import argparse
-import glob
 import os
-import re
 from tensorflow.python.platform import gfile
 import csv
-from django.contrib.auth import authenticate , login
-from django.views.generic import View
-from django.contrib.auth.models import User
 from cart.forms import CartAddProductForm
 from math import *
 from orders.models import Order
-from .forms import ImageUploadForm
-from .models import upload1
-from django.http import HttpResponseRedirect
-
-
-
-
-
-
-
-
-
-
+from upload.models import Image
 
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-# imagePath = os.path.abspath(os.path.join(BASE_DIR, 'img/258890_img_00000002.jpg'))
 path_class = os.path.abspath(os.path.join(BASE_DIR, 'media/features'))
 modelFullPath = os.path.abspath(os.path.join(BASE_DIR, 'photos/inception_dec_2015/tensorflow_inception_graph.pb'))
 
@@ -43,8 +21,6 @@ def create_graph():
         graph_def = tf.GraphDef()
         graph_def.ParseFromString(f.read())
         _ = tf.import_graph_def(graph_def, name='')
-
-
 def run_on_image(imagePath):
     answer = None
 
@@ -64,8 +40,6 @@ def run_on_image(imagePath):
         queryfeature = np.squeeze(predictions)
 
     return queryfeature
-
-
 class Searcher:
     def __init__(self, path_class):
 
@@ -122,59 +96,12 @@ class Searcher:
 
         return results1[:limit]
 
-
-# feature = run_on_image()
-# print feature
-#
-# searcher = Searcher(path_class)
-# results = searcher.search(feature)
-# print results
-# feature = run_on_image()
-# print feature
-#
-# searcher = Searcher(path_class)
-# results = searcher.search(feature)
-# print results
-
-
-# hena de elly btreturn el context le el file bta3et el html
-
-
-
-
-
-# de el function elly bt3red el swer elly fe el database fe awel page elly el url ='/images/
-# def index(request):
-#     all_photo = Photo.objects.all()  # hena ana 3mlt connect be el database
-#     # template=loader.get_template('img/index.html')
-#     context = {
-#         'all_photo': all_photo,  # de el 7aga elly template hanem bt7tagha elly hwa el file bta3 el html
-#
-#     }
-#     return render(request, 'img/index.html',
-#                   context)  # render bta5od (request ,el path bta3 file .html elly magoud fe folder el template,context)
-
-
-# return HttpResponse(template.render(context,request))
-
-# de bst3mel el 7aga elly fe context processor.py we hya elly btandy 3la el file deatil.html url='images/reco/'
-
 def detail(request, image_id):
     det_photo = Photo.objects.get(id=image_id)
     all_photo=Photo.objects.all()
-    #os.path.abspath(os.path.join(BASE_DIR, 'img/258890_img_00000002.jpg'))
     path1='media/photos'
     path2=det_photo.name
     imagePath1 = os.path.abspath(os.path.join(BASE_DIR, os.path.join(path1,path2)))
-
-
-    # show=Photo.objects.filter(name=['258891_img_00000003.jpg','258893_img_00000005.jpg','258894_img_00000006.jpg' ])
-    # Blog.objects.filter(pk__in=[1, 4, 7])
-
-
-
-
-    # Sample.objects.filter(date__range=["2011-01-01", "2011-01-31"])
 
     feature = run_on_image(imagePath1)
     searcher = Searcher(path_class)
@@ -186,62 +113,27 @@ def detail(request, image_id):
     'image_id': image_id,
     'results': results,
     'show' :show,
-    'all_photo' :all_photo,
+    'all_photo' :all_photo,}
 
-
-}
     return render(request, 'photos/detail.html', context)
-# base_dir = '/bla/bing'
-# filename = 'data.txt'
-#
-# os.path.join(base_dir, filename)
-# '/bla/bing/data.txt'
-
-# def RSystem (request):
-# 	ima=Photo.objects.all()
-# 	return render (request,'img/')
-
-
-# class Test(generic.DetailView):
-# 	model = Photo
-# 	template_name='photos/test.html'
-#law el user 3ando images fe el cart hy2om ygeeb asamy el images elly fe el cart we ytl3ha men el database we tloop 3leha
-#we tandy el functions bta3et el recomender we t7ot el results f list we kol lma tnady 3la el recommender we ytl3 result t3mlha append m3 el list
-
-
-
-
-
-
 
 def Index(request):
-	photos=Photo.objects.all()
-	cart_product_form = CartAddProductForm()
-	return render(request,'photos/index.html',{'photos':photos,'cart_product_form': cart_product_form})
+    photos=Photo.objects.order_by('?')[:30]
+    cart_product_form = CartAddProductForm()
+    return render(request,'photos/index.html',{'photos':photos,'cart_product_form': cart_product_form})
 
+def get_all_classes_and_labels_names():
+    all_classes_names = []
+    all_classes = ImageClass.objects.all()
+    for classX in all_classes:
+        all_classes_names.append(classX.class_name)
 
-all_classes_names = []
-all_classes = ImageClass.objects.all()
-for classX in all_classes:
-	all_classes_names.append(classX.class_name)
+    all_labels_names = []
+    all_labels = LabelsClass.objects.all()
+    for label in all_labels:
+        all_labels_names.append(label.label_name)
 
-all_labels_names = []
-all_labels = LabelsClass.objects.all()
-for label in all_labels:
-	all_labels_names.append(label.label_name)
-
-
-# def get_labels_for_classX(classX):
-# 	related_labels = []
-# 	for image_class in ImageClass.objects.all():
-# 		if image_class.class_name == classX.lower():
-# 			related_images = image_class.photo_set.all()
-# 			for image in related_images:
-# 				labels = list(image.label_name.all())
-# 				for label in labels:
-# 					related_labels.append(label)
-#
-# 	return 	list(set(related_labels))
+    return all_classes_names , all_labels_names
 
 def get_all_images(name , type):
 	if type == 'class':
@@ -260,120 +152,106 @@ def get_all_images(name , type):
 	return related_images
 
 def search(request):
+    all_classes_names , all_labels_names = get_all_classes_and_labels_names()
+
 	# suggested_labels = []
-	list_for_each_word = []
-	related_images = []
-	empty = 1
-	if request.method == "POST":
-		search_text = request.POST.get("input")
-		search_words = search_text.split()
+    list_for_each_word = []
+    related_images = []
+    empty = 1
 
-		for i in range(0 , len(search_words)):
-			if search_words[i] in all_labels_names:
-				empty = 0
+    class_words_counter = 0
+    more_than_one_class = []
 
-				three_words_label = search_words[i]
-				two_words_label = search_words[i]
+    if request.method == "POST":
+        search_text = request.POST.get("input")
+        search_words = search_text.split()
 
-				if len(search_words) > i+3:
-					three_words_label= search_words[i]+' '+search_words[i+1]+' '+search_words[i+2]
-				elif len(search_words) > i+2 :
-					two_words_label = search_words[i]+' '+search_words[i+1]
+        for i in range(0 , len(search_words)):
+            if search_words[i] in all_labels_names:
+                empty = 0
 
-				if three_words_label in all_labels_names:
-					related_images = get_all_images(three_words_label , 'label')
-					i += 3
-				elif two_words_label in all_labels_names:
-					related_images = get_all_images(two_words_label, 'label')
-					i += 2
-				else:
-					related_images = get_all_images(search_words[i] , 'label')
+                three_words_label = search_words[i]
+                two_words_label = search_words[i]
 
-				if len(related_images) != 0:
+                if len(search_words) > i+3:
+                    three_words_label= search_words[i]+' '+search_words[i+1]+' '+search_words[i+2]
+                elif len(search_words) > i+2 :
+                    two_words_label = search_words[i]+' '+search_words[i+1]
+
+                if three_words_label in all_labels_names:
+                    related_images = get_all_images(three_words_label , 'label')
+                    i += 3
+                elif two_words_label in all_labels_names:
+                    related_images = get_all_images(two_words_label, 'label')
+                    i += 2
+                else:
+                    related_images = get_all_images(search_words[i] , 'label')
+
+                if len(related_images) != 0:
+                    list_for_each_word.append(related_images)
+
+            elif search_words[i] in all_classes_names:
+                class_words_counter += 1
+                more_than_one_class.append(ImageClass.objects.filter(class_name=search_words[i]).first())
+                empty = 0
+                # suggested_labels = get_labels_for_classX(search_words[i])
+                related_images = get_all_images(search_words[i] , 'class')
+                if len(related_images) != 0:
 					list_for_each_word.append(related_images)
 
-			elif search_words[i] in all_classes_names:
-				empty = 0
-				# suggested_labels = get_labels_for_classX(search_words[i])
-				related_images = get_all_images(search_words[i] , 'class')
-				if len(related_images) != 0:
-					list_for_each_word.append(related_images)
-
-		if len(list_for_each_word) != 0:
-			related_images = set(list_for_each_word[0])
-			for s in list_for_each_word[1:]:
-				related_images.intersection_update(s)
+    if len(list_for_each_word) != 0:
+            related_images = set(list_for_each_word[0])
+            for s in list_for_each_word[1:]:
+                related_images.intersection_update(s)
 
 
-	return render(request, 'photos/search.html' , {'related_images':related_images,
-												   'empty':empty , 'all_classes': ImageClass.objects.all()})
+    return render(request, 'photos/search.html' , {'related_images':related_images, 'class_words_counter' : class_words_counter ,
+                                                   'more_than_one_class' : more_than_one_class , 'empty':empty,
+                                                  'all_classes': ImageClass.objects.all()})
 
 def search_buttons(request , id):
 	classX = ImageClass.objects.filter(id=id).first()
 	images = get_all_images(classX.class_name , 'class')
 	return render(request , 'photos/show_classX_images.html' , {'related_images':images})
 
-# def suggested_labels_buttons(request , label_id , class_id):
-# 	return
+def home_page(request , username):
+    photos_of_user_orders = Photo.objects.all()
+    final_recommended_photos = Photo.objects.all()
+    photos_of_user_uploads =  Photo.objects.all()
 
+    if request.user.is_authenticated:
+        user_orders = Order.objects.filter(userid = request.user.id)
+        list_of_user_orders = []
+        for order in user_orders:
+            list_of_user_orders.append(order.product.id)
+        photos_of_user_orders = Photo.objects.filter(id__in=list_of_user_orders)
 
+        user_uploads = Image.objects.filter(userid = request.user.id)
+        list_of_user_uploads = []
+        for upload in user_uploads:
+            list_of_user_uploads.append(upload.id)
+        photos_of_user_uploads = Photo.objects.filter(id__in=list_of_user_uploads)
 
-
-def current_user_id(request):
-    l1=[]
-    if request.user.is_authenticated():
-        current_user= request.user.id
-
-        product1= Order.objects.filter(userid=current_user)
-
-        for p in product1:
-
-            l1.append(p.product)
-        l2=l1
-        print l2
-        print l1
-        elset_photo= Photo.objects.filter(name__in=l1)
-        path1 = 'media/photos'
-        l3=[]
-
-
-
-        for ph in elset_photo:
-
-            path2 = ph.name
-            imagePath2 = os.path.abspath(os.path.join(BASE_DIR, os.path.join(path1, path2)))
-            feature = run_on_image(imagePath2)
-            searcher = Searcher(path_class)
+        recommended_photos = []
+        for photo in photos_of_user_orders:
+            feature = run_on_image(photo.photo.url[1:])
+            searcher = Searcher(photo.features.url[1:])
             results = searcher.search(feature)
-            l3.append(results)
+            recommended_photos.append(results)
+
+        flatten_recommended_photos = [item for sublist in recommended_photos for item in sublist]
 
 
-        print l3
-        flat_list=[]
+        final_recommended_photos = Photo.objects.filter(name__in=flatten_recommended_photos)
 
-        for sublist in l3:
-            for item in sublist:
-                flat_list.append(item)
-        print flat_list
-
-        photos_men_eldatabase = Photo.objects.filter(name__in=flat_list)
-
+    return render(request, 'photos/user_home_page.html' , {'photos_of_user_orders':photos_of_user_orders
+                                                           , 'orders_size' : len(photos_of_user_orders)
+                                                           , 'photos_of_user_uploads' : photos_of_user_uploads
+                                                           , 'uploads_size' : len(photos_of_user_uploads)
+                                                           , 'final_recommended_photos' : final_recommended_photos
+                                                           , 'username':request.user.username})
 
 
-
-
-
-
-        context = {
-            'current_user':current_user,
-            'product1':product1,
-             'l2':l2,
-            'elset_photo':elset_photo,
-            'l3':l3,
-            'photos_men_eldatabase':photos_men_eldatabase,
-
-        }
-        return render(request, 'photos/user_page.html', context)
 
 
 # def imgsearch(request):
@@ -404,25 +282,6 @@ def current_user_id(request):
 
 
     # Do something for anonymous users.
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
