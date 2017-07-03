@@ -135,7 +135,7 @@ def handling_uploaded_photo(img):
     pic.class_name = ImageClass.objects.get(class_name=pic_class[:-1])
     pic.save()
 
-    # multilabeling
+    multilabeling
     json_file = open('model.json', 'r')
     loaded_model_json = json_file.read()
     json_file.close()

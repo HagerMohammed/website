@@ -1,29 +1,29 @@
 # -*- coding: utf-8 -*-
 
-from .forms import ImageUploadForm
 from .models import Image1
 from django.http import HttpResponseRedirect
-from django.shortcuts import render
 
-from django.views import generic
 from django.shortcuts import render , redirect
-from django.views.generic.edit import CreateView , UpdateView , DeleteView
-from django.http import HttpResponse
 import numpy as np
 import tensorflow as tf
-import argparse
-import glob
 import os
-import re
 from tensorflow.python.platform import gfile
 import csv
-from django.contrib.auth import authenticate , login
-from django.views.generic import View
-from django.contrib.auth.models import User
-from cart.forms import CartAddProductForm
+from photos.models import Photo
 from math import *
-from orders.models import Order
 from .forms import ImageUploadForm
+import os
+from photos.models import Photo , ImageClass
+import tensorflow as tf
+from tensorflow.python.platform import gfile
+import numpy as np
+from django.core.files import File
+import csv
+from itertools import izip
+from django.http import HttpResponseRedirect
+
+
+
 
 
 from django.http import HttpResponseRedirect
@@ -42,7 +42,7 @@ def create_graph():
         _ = tf.import_graph_def(graph_def, name='')
 
 
-def run_on_image(imagePath):
+def run_on_image_features(imagePath):
     answer = None
 
     if not tf.gfile.Exists(imagePath):
@@ -119,18 +119,71 @@ class Searcher:
 
         return results1[:limit]
 
-# def handel_on_image(img):
-#     features = run_on_image(img.product.url[1:])
-#     searcher = Searcher(path_class)
-#     results = searcher.search(features)
-#     list_images = results
-#     # show = Photo.objects.filter(name__in=results)
-#     views.detail()
-#
-#
-#     return
+def handel_on_image(request,img):
+    features = run_on_image_features(img.product.url[1:])
+    searcher = Searcher(path_class)
+    results = searcher.search(features)
+    list_images = results
+    show = Photo.objects.filter(name__in=results)
+    context={
+        'show':show
+    }
 
 
+
+    return render(request,'re.html',context)
+
+def run_on_image1(img_path):
+    # pic=img()
+    # pic.photo=img.product
+    # image=img.product
+
+    answer = None
+
+    if not tf.gfile.Exists(img_path):
+        tf.logging.fatal('File does not exist %s', img_path)
+        return answer
+
+    image_data = tf.gfile.FastGFile(img_path, 'rb').read()
+
+
+    create_graph()
+
+    with tf.Session() as sess:
+
+        next_to_last_tensor=sess.graph.get_tensor_by_name('final_result:0')
+        image_data = gfile.FastGFile(img_path, 'rb').read()
+        predictions = sess.run(next_to_last_tensor,{'DecodeJpeg/contents:0': image_data})
+        queryfeature = np.squeeze(predictions)
+
+    return queryfeature
+
+
+
+def run_on_image_classification(img_path):
+    # pic=img()
+    # pic.photo=img.product
+    # image=img.product
+
+    answer = None
+
+    if not tf.gfile.Exists(img_path):
+        tf.logging.fatal('File does not exist %s', img_path)
+        return answer
+
+    image_data = tf.gfile.FastGFile(img_path, 'rb').read()
+
+
+    create_graph()
+
+    with tf.Session() as sess:
+
+        next_to_last_tensor=sess.graph.get_tensor_by_name('final_result:0')
+        image_data = gfile.FastGFile(img_path, 'rb').read()
+        predictions = sess.run(next_to_last_tensor,{'DecodeJpeg/contents:0': image_data})
+        queryfeature = np.squeeze(predictions)
+
+    return queryfeature
 
 def imgsearch(request):
 
@@ -139,14 +192,22 @@ def imgsearch(request):
 
         if form.is_valid():
             p = Image1(product=request.FILES['product'])
-            # p = Image1(product=request.FILES('product'))
+
             p.save()
-            # handel_on_image(p)
+            features = run_on_image_features(p.product.url[1:])
+            # class_ = run_on_image_classification(p.product.url[1:])
+            print features
+            searcher = Searcher(path_class)
+            results = searcher.search(features)
 
-            # return HttpResponseRedirect('/photo/')
-            return render(request, 're.html')
-
-
+            list_images = results
+            print list_images
+            print results
+            show = Photo.objects.filter(name__in=results)
+            context = {
+                'show': show
+            }
+            return render(request, 're.html',context)
 
     else:
         form =  ImageUploadForm
@@ -154,7 +215,6 @@ def imgsearch(request):
 
 '''def imgsearch(request):
     return render(request, 'imgsearch.html')'''
-
 
 
 
